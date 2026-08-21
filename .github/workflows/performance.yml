@@ -40,7 +40,7 @@ jobs:
         run: |
           if [ "${{ inputs.profile || 'smoke' }}" = "load" ]; then npm run test:performance:load; else npm run test:performance; fi
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: performance-evidence
           path: reports/raw/performance-summary.json

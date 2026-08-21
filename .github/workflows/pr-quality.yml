@@ -33,7 +33,7 @@ jobs:
       - run: npm run test:unit
       - name: Upload static and unit evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: static-unit-evidence
           path: |
@@ -57,7 +57,7 @@ jobs:
       - run: npm run test:contract
       - name: Upload service-layer evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: service-test-evidence
           path: |
@@ -81,7 +81,7 @@ jobs:
       - run: npm run test:e2e
       - name: Upload E2E evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-evidence
           path: |
@@ -110,7 +110,7 @@ jobs:
       - run: npm run test:performance
       - name: Upload non-functional evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: non-functional-evidence
           path: |
@@ -152,7 +152,7 @@ jobs:
         run: node --import tsx scripts/write-evidence.ts gitleaks
       - name: Upload security evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: security-evidence
           path: reports/raw
@@ -203,7 +203,7 @@ jobs:
         run: npm run quality:report
       - name: Upload unified quality report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: continuous-quality-report
           path: reports/quality
