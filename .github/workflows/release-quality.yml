@@ -43,10 +43,15 @@ jobs:
       - run: npm run test:performance
       - name: Dependency audit
         run: npm audit --json > reports/raw/npm-audit.json || true
-      - uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241 # v0.2.6
-        with:
-          version: v0.68.2
-      - run: trivy fs --format json --output reports/raw/trivy.json .
+      - name: Filesystem vulnerability evidence
+        run: |
+          mkdir -p .trivy-cache reports/raw
+          docker run --rm \
+            --volume "$PWD:/workspace:ro" \
+            --volume "$PWD/reports/raw:/reports" \
+            --volume "$PWD/.trivy-cache:/root/.cache" \
+            aquasec/trivy:0.68.2 \
+            fs --format json --output /reports/trivy.json /workspace
       - id: gitleaks
         uses: gitleaks/gitleaks-action@v2.3.9
         env:
