@@ -144,7 +144,7 @@ jobs:
             aquasec/trivy:0.68.2 \
             fs --format json --output /reports/trivy.json \
             --severity LOW,MEDIUM,HIGH,CRITICAL /workspace
-      - uses: gitleaks/gitleaks-action@v2.3.9
+      - uses: gitleaks/gitleaks-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: security/gitleaks/gitleaks.toml
