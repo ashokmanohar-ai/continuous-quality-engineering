@@ -171,27 +171,27 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Download static and unit evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: static-unit-evidence
           path: reports
       - name: Download service-layer evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: service-test-evidence
           path: .
       - name: Download E2E evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: e2e-evidence
           path: reports
       - name: Download non-functional evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: non-functional-evidence
           path: reports
       - name: Download security evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: security-evidence
           path: reports/raw
