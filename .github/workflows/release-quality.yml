@@ -1,0 +1,84 @@
+name: Release Quality
+
+on:
+  push:
+    branches: ['release/**']
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  full-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: release-quality
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: npm
+      - uses: grafana/setup-k6-action@v1
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run static
+      - run: npm run test:unit
+      - run: npm run test:contract
+      - run: npm run test:api
+      - run: npm run test:integration
+      - run: npm run test:e2e
+      - run: npm run test:accessibility
+      - name: Start service for performance and DAST
+        run: |
+          npm run app:start:test > /tmp/acme-order-service.log 2>&1 &
+          npm run wait:health
+      - run: npm run test:performance
+      - name: Dependency audit
+        run: npm audit --json > reports/raw/npm-audit.json || true
+      - name: Filesystem vulnerability evidence
+        run: |
+          mkdir -p .trivy-cache reports/raw
+          docker run --rm \
+            --volume "$PWD:/workspace:ro" \
+            --volume "$PWD/reports/raw:/reports" \
+            --volume "$PWD/.trivy-cache:/root/.cache" \
+            aquasec/trivy:0.68.2 \
+            fs --format json --output /reports/trivy.json /workspace
+      - id: gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: security/gitleaks/gitleaks.toml
+      - if: steps.gitleaks.outcome == 'success'
+        run: node --import tsx scripts/write-evidence.ts gitleaks
+      - if: always()
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: http://127.0.0.1:3000
+          rules_file_name: security/zap/zap-baseline.conf
+          allow_issue_writing: false
+          artifact_name: release-zap-report
+      - name: Preserve ZAP JSON
+        if: always()
+        run: |
+          if [ -f report_json.json ]; then cp report_json.json reports/raw/zap.json; fi
+      - name: Aggregate and enforce
+        if: always()
+        run: |
+          npm run quality:aggregate
+          npm run quality:report
+          npm run quality:gate
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-quality-report
+          path: reports
+          retention-days: 90

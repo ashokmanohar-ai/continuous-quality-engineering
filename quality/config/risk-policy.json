@@ -1,0 +1,16 @@
+{
+  "LOW": ["static", "unit", "api"],
+  "MEDIUM": ["static", "unit", "api", "integration", "contract"],
+  "HIGH": ["static", "unit", "api", "integration", "contract", "e2e", "accessibility"],
+  "CRITICAL": [
+    "static",
+    "unit",
+    "api",
+    "integration",
+    "contract",
+    "e2e",
+    "accessibility",
+    "security",
+    "performance"
+  ]
+}

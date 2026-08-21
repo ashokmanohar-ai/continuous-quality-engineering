@@ -1,0 +1,49 @@
+name: Nightly Regression
+
+on:
+  schedule:
+    - cron: '0 1 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NIGHTLY: 'true'
+      TEST_ENV: QA
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run static
+      - run: npm run test:unit
+      - run: npm run test:contract
+      - run: npm run test:api
+      - run: npm run test:integration
+      - run: npm run test:e2e
+      - run: npm run test:accessibility
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-functional-evidence
+          path: reports
+          retention-days: 30
+
+  security:
+    uses: ./.github/workflows/security.yml
+
+  performance:
+    uses: ./.github/workflows/performance.yml

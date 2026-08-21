@@ -1,0 +1,32 @@
+{
+  "mandatoryReports": [
+    "static",
+    "unit",
+    "api",
+    "integration",
+    "contract",
+    "e2e",
+    "accessibility",
+    "npm-audit",
+    "gitleaks",
+    "trivy",
+    "performance"
+  ],
+  "unit": { "minimumPassRate": 100, "minimumCoverage": 80 },
+  "api": { "minimumPassRate": 100 },
+  "integration": { "minimumPassRate": 100 },
+  "contract": { "minimumPassRate": 100 },
+  "e2e": { "criticalPassRate": 100, "overallPassRate": 98 },
+  "accessibility": { "criticalViolations": 0, "seriousViolations": 0 },
+  "security": { "critical": 0, "high": 0, "secrets": 0, "mediumWarning": 0 },
+  "performance": { "warningP95Ms": 900, "failureP95Ms": 1000, "errorRatePercent": 1 },
+  "flaky": { "maximumCritical": 0 },
+  "weights": {
+    "codeQuality": 10,
+    "functional": 30,
+    "e2e": 20,
+    "security": 20,
+    "performance": 10,
+    "accessibility": 10
+  }
+}

@@ -1,0 +1,33 @@
+services:
+  demo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: continuous-quality-engineering/acme-order-service:local
+    environment:
+      NODE_ENV: production
+      TEST_ENV: LOCAL
+      APP_HOST: 0.0.0.0
+      APP_PORT: 3000
+      APP_DB: /app/data/acme-orders.db
+      SESSION_TTL_MINUTES: 60
+    ports:
+      - '3000:3000'
+    volumes:
+      - acme-order-data:/app/data
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  acme-order-data:

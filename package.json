@@ -1,0 +1,64 @@
+{
+  "name": "continuous-quality-engineering",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-style reference implementation for evidence-based continuous quality gates.",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "scarfSettings": {
+    "enabled": false
+  },
+  "scripts": {
+    "app:start": "npm run build && node dist/demo-app/src/server.js",
+    "app:start:test": "npm run build && cross-env NODE_ENV=test APP_HOST=127.0.0.1 APP_PORT=3000 APP_DB=:memory: node dist/demo-app/src/server.js",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "static": "npm run lint && npm run format:check && npm run typecheck && node --import tsx scripts/write-evidence.ts static",
+    "test:unit": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=reports/raw/unit-junit.xml",
+    "test:api": "cross-env TEST_LAYER=api playwright test tests/api",
+    "test:integration": "cross-env TEST_LAYER=integration playwright test tests/integration",
+    "test:contract": "vitest run --config vitest.contract.config.ts --reporter=default --reporter=junit --outputFile.junit=reports/raw/contract-junit.xml",
+    "test:e2e": "cross-env TEST_LAYER=e2e playwright test tests/e2e",
+    "test:e2e:critical": "cross-env TEST_LAYER=e2e E2E_TAG=@critical playwright test tests/e2e --grep @critical",
+    "test:accessibility": "cross-env TEST_LAYER=accessibility playwright test tests/accessibility",
+    "test:performance": "k6 run tests/performance/smoke.js",
+    "test:performance:load": "k6 run tests/performance/load.js",
+    "quality:aggregate": "node --import tsx scripts/aggregate-results.ts",
+    "quality:gate": "node --import tsx quality/engine/quality-gate.ts",
+    "quality:score": "node --import tsx quality/engine/quality-score.ts",
+    "quality:report": "node --import tsx scripts/generate-quality-report.ts",
+    "quality:negative": "vitest run quality/engine/quality-gate.spec.ts",
+    "security:gate": "node --import tsx scripts/security-gate.ts",
+    "quality": "npm run static && npm run test:unit && npm run test:contract && npm run test:api && npm run test:integration && npm run test:e2e && npm run test:accessibility",
+    "quality:evaluate": "npm run quality:aggregate && npm run quality:report && npm run quality:gate",
+    "pipeline:validate": "node --import tsx scripts/validate-pipeline.ts",
+    "impact": "node --import tsx scripts/change-impact.ts",
+    "wait:health": "node --import tsx scripts/wait-for-health.ts",
+    "prepare": "node -e \"require('node:fs').mkdirSync('reports/raw',{recursive:true});require('node:fs').mkdirSync('reports/quality',{recursive:true})\""
+  },
+  "dependencies": {
+    "fastify": "^5.12.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "@eslint/js": "^10.0.1",
+    "@pact-foundation/pact": "^17.1.2",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^22.19.1",
+    "@vitest/coverage-v8": "^4.0.3",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.8.1",
+    "prettier": "^3.7.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.11",
+    "yaml": "^2.8.1"
+  }
+}

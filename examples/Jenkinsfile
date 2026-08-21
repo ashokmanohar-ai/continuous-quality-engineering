@@ -1,0 +1,16 @@
+pipeline {
+  agent any
+  tools { nodejs 'node-22' }
+  stages {
+    stage('Install') { steps { sh 'npm ci' } }
+    stage('Fast evidence') {
+      parallel {
+        stage('Static + unit') { steps { sh 'npm run static && npm run test:unit' } }
+        stage('API + integration + contract') { steps { sh 'npm run test:api && npm run test:integration && npm run test:contract' } }
+        stage('E2E + accessibility') { steps { sh 'npm run test:e2e && npm run test:accessibility' } }
+      }
+    }
+    stage('Gate') { steps { sh 'npm run quality:aggregate && npm run quality:report && npm run quality:gate' } }
+  }
+  post { always { archiveArtifacts artifacts: 'reports/**', fingerprint: true } }
+}

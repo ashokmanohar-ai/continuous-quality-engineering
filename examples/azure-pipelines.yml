@@ -1,0 +1,35 @@
+trigger: none
+pr:
+  branches:
+    include: [main]
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Evidence
+    jobs:
+      - job: StaticUnit
+        steps:
+          - task: NodeTool@0
+            inputs: { versionSpec: 22.22.0 }
+          - script: npm ci
+          - script: npm run static && npm run test:unit
+          - publish: reports
+            artifact: static-unit-evidence
+      - job: ServiceTests
+        steps:
+          - task: NodeTool@0
+            inputs: { versionSpec: 22.22.0 }
+          - script: npm ci
+          - script: npm run test:api && npm run test:integration && npm run test:contract
+          - publish: reports
+            artifact: service-test-evidence
+  - stage: Gate
+    dependsOn: Evidence
+    jobs:
+      - job: ReleaseDecision
+        steps:
+          - script: npm ci
+          - download: current
+          - script: npm run quality:aggregate && npm run quality:report && npm run quality:gate

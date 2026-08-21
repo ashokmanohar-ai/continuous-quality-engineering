@@ -1,0 +1,5 @@
+[
+  { "build": 101, "score": 95, "decision": "PASS", "label": "SYNTHETIC_DEMO" },
+  { "build": 102, "score": 97, "decision": "PASS", "label": "SYNTHETIC_DEMO" },
+  { "build": 103, "score": 92, "decision": "CONDITIONAL_PASS", "label": "SYNTHETIC_DEMO" }
+]

@@ -1,0 +1,7 @@
+node_modules
+package-lock.json
+reports
+playwright-report
+contracts/pacts
+quality-history
+continuous-quality-engineering.zip
