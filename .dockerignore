@@ -1,0 +1,7 @@
+.git
+.github
+node_modules
+reports
+playwright-report
+*.db
+continuous-quality-engineering.zip

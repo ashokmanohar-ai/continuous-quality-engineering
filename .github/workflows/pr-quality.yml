@@ -1,0 +1,185 @@
+name: PR Quality
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 22.22.0
+  TEST_ENV: QA
+
+jobs:
+  static-unit:
+    name: Static analysis and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run static
+      - run: npm run test:unit
+      - name: Upload static and unit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-unit-evidence
+          path: |
+            reports/raw/static.json
+            reports/raw/unit-junit.xml
+            reports/coverage
+          retention-days: 14
+
+  api-integration-contract:
+    name: API, integration, and contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test:api
+      - run: npm run test:integration
+      - run: npm run test:contract
+      - name: Upload service-layer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: service-test-evidence
+          path: |
+            reports/raw/api-playwright.json
+            reports/raw/integration-playwright.json
+            reports/raw/contract-junit.xml
+            contracts/pacts
+          retention-days: 14
+
+  e2e-critical:
+    name: Critical browser journeys
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-evidence
+          path: |
+            reports/raw/e2e-playwright.json
+            reports/playwright/e2e
+            reports/test-results/e2e
+          retention-days: 14
+
+  accessibility-performance:
+    name: Accessibility and performance smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: grafana/setup-k6-action@v1
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:accessibility
+      - name: Start service for k6
+        run: |
+          npm run app:start:test > /tmp/acme-order-service.log 2>&1 &
+          npm run wait:health
+      - run: npm run test:performance
+      - name: Upload non-functional evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: non-functional-evidence
+          path: |
+            reports/raw/accessibility.json
+            reports/raw/accessibility-playwright.json
+            reports/raw/performance-summary.json
+            reports/playwright/accessibility
+          retention-days: 14
+
+  security-fast:
+    name: Fast security evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Dependency audit evidence
+        run: npm audit --json > reports/raw/npm-audit.json || true
+      - uses: aquasecurity/setup-trivy@v0.2.4
+        with:
+          version: v0.68.2
+      - name: Filesystem vulnerability evidence
+        run: trivy fs --format json --output reports/raw/trivy.json --severity LOW,MEDIUM,HIGH,CRITICAL .
+      - uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: security/gitleaks/gitleaks.toml
+      - name: Record successful Gitleaks evidence
+        run: node --import tsx scripts/write-evidence.ts gitleaks
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence
+          path: reports/raw
+          retention-days: 14
+
+  quality-gate:
+    name: Automated quality gate
+    if: always()
+    needs: [static-unit, api-integration-contract, e2e-critical, accessibility-performance, security-fast]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*-evidence'
+          path: .
+          merge-multiple: true
+      - run: npm run quality:aggregate
+      - run: npm run quality:gate -- --policy quality/config/quality-gates.pr.json
+      - if: always()
+        env:
+          QUALITY_POLICY: quality/config/quality-gates.pr.json
+        run: npm run quality:report
+      - name: Upload unified quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: continuous-quality-report
+          path: reports/quality
+          retention-days: 30

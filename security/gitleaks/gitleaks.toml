@@ -1,0 +1,11 @@
+title = "Continuous Quality Engineering Gitleaks policy"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Non-secret deterministic demo values"
+paths = [
+  '''quality/fixtures/.*''',
+  '''docs/.*'''
+]

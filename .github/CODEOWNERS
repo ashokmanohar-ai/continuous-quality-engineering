@@ -1,0 +1,5 @@
+# Replace this illustrative team with the adopter's real GitHub team.
+* @quality-engineering-team
+/.github/ @quality-engineering-team
+/quality/ @quality-engineering-team
+/security/ @quality-engineering-team

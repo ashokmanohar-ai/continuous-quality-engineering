@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+*.db
+*.db-shm
+*.db-wal
+reports/*
+!reports/.gitkeep
+playwright-report/
+test-results/
+contracts/pacts/*.json
+!contracts/pacts/.gitkeep
+continuous-quality-engineering.zip
+.DS_Store
+*.log

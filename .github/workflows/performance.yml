@@ -1,0 +1,47 @@
+name: Performance Quality
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: k6 profile
+        required: true
+        default: smoke
+        type: choice
+        options: [smoke, load]
+  schedule:
+    - cron: '30 2 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: npm
+      - uses: grafana/setup-k6-action@v1
+      - run: npm ci
+      - name: Start application
+        run: |
+          npm run app:start:test > /tmp/acme-order-service.log 2>&1 &
+          npm run wait:health
+      - name: Run selected profile
+        run: |
+          if [ "${{ inputs.profile || 'smoke' }}" = "load" ]; then npm run test:performance:load; else npm run test:performance; fi
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-evidence
+          path: reports/raw/performance-summary.json
+          retention-days: 30
