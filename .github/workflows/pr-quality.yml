@@ -134,11 +134,16 @@ jobs:
       - run: npm ci
       - name: Dependency audit evidence
         run: npm audit --json > reports/raw/npm-audit.json || true
-      - uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241 # v0.2.6
-        with:
-          version: v0.68.2
       - name: Filesystem vulnerability evidence
-        run: trivy fs --format json --output reports/raw/trivy.json --severity LOW,MEDIUM,HIGH,CRITICAL .
+        run: |
+          mkdir -p .trivy-cache reports/raw
+          docker run --rm \
+            --volume "$PWD:/workspace:ro" \
+            --volume "$PWD/reports/raw:/reports" \
+            --volume "$PWD/.trivy-cache:/root/.cache" \
+            aquasec/trivy:0.68.2 \
+            fs --format json --output /reports/trivy.json \
+            --severity LOW,MEDIUM,HIGH,CRITICAL /workspace
       - uses: gitleaks/gitleaks-action@v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -165,11 +170,31 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - name: Download static and unit evidence
+        uses: actions/download-artifact@v4
         with:
-          pattern: '*-evidence'
+          name: static-unit-evidence
+          path: reports
+      - name: Download service-layer evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: service-test-evidence
           path: .
-          merge-multiple: true
+      - name: Download E2E evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: e2e-evidence
+          path: reports
+      - name: Download non-functional evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: non-functional-evidence
+          path: reports
+      - name: Download security evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: security-evidence
+          path: reports/raw
       - run: npm run quality:aggregate
       - run: npm run quality:gate -- --policy quality/config/quality-gates.pr.json
       - if: always()
