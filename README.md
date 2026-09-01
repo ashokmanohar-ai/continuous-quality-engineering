@@ -7,6 +7,30 @@ A production-style reference implementation demonstrating how modern engineering
 [![Quality Gate](https://img.shields.io/badge/Quality%20Gate-Evidence%20Based-0B69A3)](docs/quality-gates.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## Recruiter quick tour
+
+> **60-second decision:** this repository proves quality as a measurable delivery-system property, combining functional, contract, accessibility, security and performance evidence into a transparent release recommendation.
+
+| Recruiter question | Verifiable answer |
+| --- | --- |
+| **Problem** | Passing unit tests does not prove release readiness when mandatory security, accessibility, performance or flaky-test evidence is absent. |
+| **Architecture** | Static/unit, API/integration/contract, E2E/accessibility and security/performance jobs feed one normalized evidence model; hard gates and a transparent weighted score produce PASS, CONDITIONAL_PASS or FAIL. |
+| **Evidence** | Fastify/TypeScript demo service, Vitest, Playwright, Pact, Axe, k6, npm audit, Gitleaks, Trivy, ZAP, CodeQL, Docker, change-impact analysis and five GitHub Actions workflows. |
+| **Role signal** | Quality Engineering Architect, Test Architect, QE Practice Lead and Release Quality Engineer. |
+
+**Five-minute proof**
+
+```bash
+npm ci
+npx playwright install --with-deps chromium
+npm run quality
+npm run quality:aggregate
+npm run quality:report
+npm run quality:gate
+```
+
+Expected proof: layered test evidence plus machine-readable and HTML release-decision artifacts. All datasets, applications and walkthrough claims are synthetic/reference evidence unless explicitly stated otherwise.
+
 ## The business problem
 
 Passing unit tests is not a release decision. Delivery teams need fast feedback on pull requests and deeper evidence for release candidates without hiding security findings, performance regressions, accessibility defects, missing reports, or flaky recoveries. This repository turns those independent signals into a transparent, configurable recommendation: `PASS`, `CONDITIONAL_PASS`, or `FAIL`.
