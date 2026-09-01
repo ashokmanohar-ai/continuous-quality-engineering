@@ -11,12 +11,12 @@ A production-style reference implementation demonstrating how modern engineering
 
 > **60-second decision:** this repository proves quality as a measurable delivery-system property, combining functional, contract, accessibility, security and performance evidence into a transparent release recommendation.
 
-| Recruiter question | Verifiable answer |
-| --- | --- |
-| **Problem** | Passing unit tests does not prove release readiness when mandatory security, accessibility, performance or flaky-test evidence is absent. |
-| **Architecture** | Static/unit, API/integration/contract, E2E/accessibility and security/performance jobs feed one normalized evidence model; hard gates and a transparent weighted score produce PASS, CONDITIONAL_PASS or FAIL. |
-| **Evidence** | Fastify/TypeScript demo service, Vitest, Playwright, Pact, Axe, k6, npm audit, Gitleaks, Trivy, ZAP, CodeQL, Docker, change-impact analysis and five GitHub Actions workflows. |
-| **Role signal** | Quality Engineering Architect, Test Architect, QE Practice Lead and Release Quality Engineer. |
+| Recruiter question | Verifiable answer                                                                                                                                                                                              |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Problem**        | Passing unit tests does not prove release readiness when mandatory security, accessibility, performance or flaky-test evidence is absent.                                                                      |
+| **Architecture**   | Static/unit, API/integration/contract, E2E/accessibility and security/performance jobs feed one normalized evidence model; hard gates and a transparent weighted score produce PASS, CONDITIONAL_PASS or FAIL. |
+| **Evidence**       | Fastify/TypeScript demo service, Vitest, Playwright, Pact, Axe, k6, npm audit, Gitleaks, Trivy, ZAP, CodeQL, Docker, change-impact analysis and five GitHub Actions workflows.                                 |
+| **Role signal**    | Quality Engineering Architect, Test Architect, QE Practice Lead and Release Quality Engineer.                                                                                                                  |
 
 **Five-minute proof**
 
