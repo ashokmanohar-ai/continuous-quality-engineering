@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use or reference this work, please cite it using the metadata below."
+title: "Quality Gates for Generative AI: Designing Release Policies for LLM, RAG and Agentic Systems"
+type: article
+authors:
+  - family-names: Manohar
+    given-names: Ashok Kumar
+version: 1.0.0
+date-released: 2026-09-05
+url: "https://github.com/ashokmanohar-ai/continuous-quality-engineering/blob/main/publications/QUALITY_GATES_FOR_GENERATIVE_AI.md"
+repository-code: "https://github.com/ashokmanohar-ai/continuous-quality-engineering"
+license: MIT
+keywords:
+  - Generative AI Quality Gates
+  - AI Quality Engineering
+  - LLM Evaluation
+  - RAG Evaluation
+  - AI Agent Evaluation
+  - Agentic AI
+  - CI/CD
+  - Release Governance
+  - Quality Gates
+  - Baseline Regression
+  - Human-in-the-Loop
+  - AI Security
+  - LLM-as-a-Judge
+  - AI Observability
+  - Responsible AI
+  - AI Governance
+abstract: >-
+  A practical Quality Engineering framework for designing release policies for
+  LLM, RAG and agentic systems. The work introduces an
+  Evidence-Policy-Gate-Decision-Feedback model spanning mandatory evidence,
+  deterministic-first controls, LLM/RAG/agent evaluation, hard gates, warning
+  gates, advisory metrics, missing-evidence handling, baseline comparison,
+  regression budgets, security and authorization, human approval,
+  LLM-as-a-Judge governance, performance, cost, observability, risk-based
+  pull-request/nightly/release profiles, human exceptions and
+  production-to-regression learning.
