@@ -7,6 +7,16 @@ A production-style reference implementation demonstrating how modern engineering
 [![Quality Gate](https://img.shields.io/badge/Quality%20Gate-Evidence%20Based-0B69A3)](docs/quality-gates.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## 📄 Technical White Paper
+
+**[Continuous AI Quality Engineering: Integrating LLM, RAG and Agent Evaluation into CI/CD Quality Gates](WHITEPAPER.md)**
+
+A practitioner-focused white paper showing how conventional CI/CD quality engineering can be extended for probabilistic AI systems. It covers versioned evaluation datasets, deterministic-first LLM/RAG/agent checks, calibrated semantic judges, candidate-versus-baseline comparison, risk-based evaluation profiles, security gates, missing-evidence handling, latency and cost, observability, production-to-regression feedback, and unified release decisions.
+
+> **Core principle:** an AI-enabled release is ready only when conventional software evidence and AI-specific evaluation evidence jointly satisfy an explicit, risk-calibrated quality policy.
+
+Citation metadata is available in [`CITATION.cff`](CITATION.cff).
+
 ## Recruiter quick tour
 
 > **60-second decision:** this repository proves quality as a measurable delivery-system property, combining functional, contract, accessibility, security and performance evidence into a transparent release recommendation.
